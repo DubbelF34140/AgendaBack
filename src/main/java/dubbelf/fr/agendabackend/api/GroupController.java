@@ -4,6 +4,7 @@ import dubbelf.fr.agendabackend.bo.Group;
 import dubbelf.fr.agendabackend.bll.GroupService;
 import dubbelf.fr.agendabackend.bo.User;
 import dubbelf.fr.agendabackend.dto.GroupDTO;
+import dubbelf.fr.agendabackend.dto.InviteRequest;
 import dubbelf.fr.agendabackend.dto.MemberRespond;
 import dubbelf.fr.agendabackend.dto.UserRespond;
 import jakarta.servlet.http.HttpServletRequest;
@@ -119,7 +120,21 @@ public class GroupController {
                     .body("JWT token is missing or invalid");
         }
 
-        groupService.deleteGroup(groupId);
+        groupService.deleteGroup(groupId, jwtToken);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{groupId}/invite")
+    public ResponseEntity<Void> inviteUserToGroup(@PathVariable UUID groupId, @RequestBody InviteRequest inviteRequest, HttpServletRequest request) {
+        String jwtToken = parseJwt(request);
+        groupService.inviteUserToGroup(groupId, inviteRequest.getUserId(), jwtToken);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{groupId}/remove")
+    public ResponseEntity<Void> removeUserFromGroup(@PathVariable UUID groupId, @RequestBody InviteRequest inviteRequest, HttpServletRequest request) {
+        String jwtToken = parseJwt(request);
+        groupService.removeUserFromGroup(groupId, inviteRequest.getUserId(), jwtToken);
+        return ResponseEntity.ok().build();
     }
 }

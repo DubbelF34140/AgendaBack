@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class GroupMember {
 
     @EmbeddedId
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private GroupMemberId id;
 
     @ManyToOne
@@ -32,6 +33,7 @@ public class GroupMember {
     private LocalDateTime joinedAt = LocalDateTime.now();
 
     public GroupMember(User user, Group group) {
+        this.id = null;
         this.group = group;
         this.user = user;
         this.role = Role.MEMBER;

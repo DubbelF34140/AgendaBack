@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,10 +87,13 @@ public class GroupService {
     }
 
     // Supprimer un groupe
-    public void deleteGroup(UUID groupId) {
+    public void deleteGroup(UUID groupId, String jwtToken) {
         Optional<Group> groupOpt = groupRepository.findById(groupId);
         if (groupOpt.isEmpty()) {
             throw new RuntimeException("Group not found");
+        }
+        if (userRepository.findUserById(jwtUtils.getIDFromJwtToken(jwtToken)).getId() != groupOpt.get().getCreatedBy().getId()){
+            throw new RuntimeException("Only Owner can delete group");
         }
         groupRepository.delete(groupOpt.get());
     }
@@ -151,6 +155,63 @@ public class GroupService {
         }
 
         return userRespondList;
+    }
+
+    public void inviteUserToGroup(UUID groupId, UUID userId, String jwtToken) {
+        // Vérifier si le groupe existe
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
+        UUID currentUserId = jwtUtils.getIDFromJwtToken(jwtToken);
+
+        GroupMember currentUserGroupMember = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not a member of this group"));
+
+        // Vérifier si l'utilisateur actuel est le propriétaire, admin ou modérateur
+        if (!isUserAuthorizedToInviteUserInGroup(currentUserGroupMember)) {
+            throw new RuntimeException("User does not have permission to remove this member");
+        }
+
+        // Vérifier si l'utilisateur existe
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Vérifier si l'utilisateur n'est pas déjà membre du groupe
+        boolean isAlreadyMember = group.getUsers().stream().anyMatch(member -> member.getId().equals(userId));
+        if (isAlreadyMember) {
+            throw new RuntimeException("User is already a member of the group");
+        }
+
+        GroupMember groupMember = new GroupMember(user, group);
+        GroupMemberId groupMemberId = new GroupMemberId(group.getId(), user.getId());
+        groupMember.setId(groupMemberId);
+        groupMemberRepository.save(groupMember);
+    }
+
+    public void removeUserFromGroup(UUID groupId, UUID userId, String jwtToken) {
+        // Vérifier si l'utilisateur qui veut supprimer a les droits nécessaires
+        UUID currentUserId = jwtUtils.getIDFromJwtToken(jwtToken);
+        GroupMember currentUserGroupMember = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not a member of this group"));
+
+        // Vérifier si l'utilisateur actuel est le propriétaire, admin ou modérateur
+        if (!isUserAuthorizedToModifyGroup(currentUserGroupMember)) {
+            throw new RuntimeException("User does not have permission to remove this member");
+        }
+
+        // Vérifier si l'utilisateur à supprimer est dans le groupe
+        GroupMember groupMemberToRemove = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
+                .orElseThrow(() -> new RuntimeException("User not in this group"));
+
+        // Supprimer le membre du groupe
+        groupMemberRepository.delete(groupMemberToRemove);
+    }
+
+    private boolean isUserAuthorizedToModifyGroup(GroupMember groupMember) {
+        Role role = groupMember.getRole();
+        return role == Role.OWNER || role == Role.ADMIN || role == Role.MODERATOR;
+    }
+
+    private boolean isUserAuthorizedToInviteUserInGroup(GroupMember groupMember) {
+        Role role = groupMember.getRole();
+        return role == Role.OWNER || role == Role.ADMIN || role == Role.MODERATOR || role == Role.MEMBER;
     }
 
 }
