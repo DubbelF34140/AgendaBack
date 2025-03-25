@@ -9,6 +9,7 @@ public class UserRespond {
     private String pseudo;
     private String avatarUrl;
     private LocalDateTime createdAt;
+    private Boolean administrateur;
 
     public UUID getId() {
         return id;
@@ -48,5 +49,13 @@ public class UserRespond {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Boolean getAdministrateur() {
+        return administrateur;
+    }
+
+    public void setAdministrateur(Boolean administrateur) {
+        this.administrateur = administrateur;
     }
 }

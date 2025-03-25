@@ -37,6 +37,7 @@ public class UserService {
         userRespond.setPseudo(user.getPseudo());
         userRespond.setId(user.getId());
         userRespond.setCreatedAt(user.getCreatedAt());
+        userRespond.setAdministrateur(user.isAdministrateur());
         return userRespond;
     }
 

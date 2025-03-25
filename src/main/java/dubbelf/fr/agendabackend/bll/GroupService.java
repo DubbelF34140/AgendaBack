@@ -151,6 +151,7 @@ public class GroupService {
             userRespond.setAvatarUrl(member.getAvatarUrl());
             userRespond.setCreatedAt(member.getCreatedAt());
             userRespond.setRole(groupMember.getRole());
+            userRespond.setId(member.getId());
             userRespondList.add(userRespond);
         }
 
