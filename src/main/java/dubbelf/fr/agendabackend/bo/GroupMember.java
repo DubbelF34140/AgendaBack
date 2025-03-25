@@ -26,12 +26,17 @@ public class GroupMember {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
+    private Role role = Role.MEMBER;
 
     @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
+
+    public GroupMember(User user, Group group) {
+        this.group = group;
+        this.user = user;
+        this.role = Role.MEMBER;
+        this.joinedAt = LocalDateTime.now();
+    }
 
     public GroupMemberId getId() {
         return id;
