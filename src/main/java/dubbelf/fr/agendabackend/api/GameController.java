@@ -2,6 +2,8 @@ package dubbelf.fr.agendabackend.api;
 
 import dubbelf.fr.agendabackend.bll.GameService;
 import dubbelf.fr.agendabackend.bo.Game;
+import dubbelf.fr.agendabackend.dto.GameCreateDTO;
+import dubbelf.fr.agendabackend.dto.RespondGameDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +13,16 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/games")
+@CrossOrigin(origins = "*")
 public class GameController {
 
     @Autowired
     private GameService gameService;
 
     @PostMapping
-    public ResponseEntity<Game> createGame(@RequestBody Game game) {
-        return ResponseEntity.ok(gameService.createGame(game));
+    public ResponseEntity<Game> createGame(@RequestBody GameCreateDTO gameCreateDTO) {
+        Game createdGame = gameService.createGame(gameCreateDTO);
+        return ResponseEntity.ok(createdGame);
     }
 
     @GetMapping("/{gameId}")
@@ -27,7 +31,7 @@ public class GameController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Game>> getAllGames() {
+    public ResponseEntity<List<RespondGameDTO>> getAllGames() {
         return ResponseEntity.ok(gameService.getAllGames());
     }
 

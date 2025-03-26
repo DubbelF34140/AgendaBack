@@ -1,12 +1,10 @@
 package dubbelf.fr.agendabackend.api;
 
+import dubbelf.fr.agendabackend.bo.Event;
 import dubbelf.fr.agendabackend.bo.Group;
 import dubbelf.fr.agendabackend.bll.GroupService;
 import dubbelf.fr.agendabackend.bo.User;
-import dubbelf.fr.agendabackend.dto.GroupDTO;
-import dubbelf.fr.agendabackend.dto.InviteRequest;
-import dubbelf.fr.agendabackend.dto.MemberRespond;
-import dubbelf.fr.agendabackend.dto.UserRespond;
+import dubbelf.fr.agendabackend.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +26,7 @@ public class GroupController {
     private GroupService groupService;
 
     // Méthode pour extraire le jeton JWT depuis l'en-tête de la requête
-    private String parseJwt(HttpServletRequest request) {
+    public String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7); // Retourne le token sans "Bearer "
@@ -92,6 +90,19 @@ public class GroupController {
         }
 
         Group updatedGroup = groupService.getGroup(groupId, jwtToken);
+        return ResponseEntity.ok(updatedGroup);
+    }
+    @GetMapping("/{groupId}/events")
+    public ResponseEntity<?> getGroupEvents(@PathVariable UUID groupId, HttpServletRequest request) {
+        // Utilisez parseJwt pour extraire le JWT
+        String jwtToken = parseJwt(request);
+
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("JWT token is missing or invalid");
+        }
+
+        List<RespondEventDTO> updatedGroup = groupService.getGroupEvents(groupId, jwtToken);
         return ResponseEntity.ok(updatedGroup);
     }
 

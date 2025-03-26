@@ -1,11 +1,15 @@
 package dubbelf.fr.agendabackend.bll;
 
 import dubbelf.fr.agendabackend.bo.*;
+import dubbelf.fr.agendabackend.dal.EventRepository;
 import dubbelf.fr.agendabackend.dal.GroupMemberRepository;
 import dubbelf.fr.agendabackend.dal.GroupRepository;
 import dubbelf.fr.agendabackend.dal.UserRepository;
+import dubbelf.fr.agendabackend.dto.EventDTO;
 import dubbelf.fr.agendabackend.dto.GroupDTO;
 import dubbelf.fr.agendabackend.dto.MemberRespond;
+import dubbelf.fr.agendabackend.dto.RespondEventDTO;
+import dubbelf.fr.agendabackend.mapper.EventMapper;
 import dubbelf.fr.agendabackend.mapper.GroupMapper;
 import dubbelf.fr.agendabackend.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,9 @@ public class GroupService {
 
     @Autowired
     private GroupRepository groupRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Autowired
     private GroupMemberRepository groupMemberRepository;
@@ -205,14 +212,24 @@ public class GroupService {
         groupMemberRepository.delete(groupMemberToRemove);
     }
 
-    private boolean isUserAuthorizedToModifyGroup(GroupMember groupMember) {
+    public boolean isUserAuthorizedToModifyGroup(GroupMember groupMember) {
         Role role = groupMember.getRole();
         return role == Role.OWNER || role == Role.ADMIN || role == Role.MODERATOR;
     }
 
-    private boolean isUserAuthorizedToInviteUserInGroup(GroupMember groupMember) {
+    public boolean isUserAuthorizedToInviteUserInGroup(GroupMember groupMember) {
         Role role = groupMember.getRole();
         return role == Role.OWNER || role == Role.ADMIN || role == Role.MODERATOR || role == Role.MEMBER;
+    }
+
+    public List<RespondEventDTO> getGroupEvents(UUID groupId, String jwtToken) {
+        UUID currentUserId = jwtUtils.getIDFromJwtToken(jwtToken);
+        GroupMember currentUserGroupMember = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not a member of this group"));
+
+        List<Event> events = eventRepository.findAllByGroupId(groupId);
+
+        return events.stream().map(EventMapper::toDTO).collect(Collectors.toList());
     }
 
 }

@@ -1,5 +1,6 @@
 package dubbelf.fr.agendabackend.bo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class GameSetting {
 
     @ManyToOne
     @JoinColumn(name = "game_id", nullable = false)
+    @JsonIgnore
     private Game game;
 
     @Column(nullable = false)

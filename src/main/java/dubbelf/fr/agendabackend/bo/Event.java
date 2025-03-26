@@ -29,6 +29,9 @@ public class Event {
     @Column
     private String description;
 
+    @Column
+    private String color;
+
     @Column(nullable = false)
     private LocalDateTime startTime;
 
@@ -104,5 +107,13 @@ public class Event {
 
     public void setEventSettings(List<EventSetting> eventSettings) {
         this.eventSettings = eventSettings;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }
