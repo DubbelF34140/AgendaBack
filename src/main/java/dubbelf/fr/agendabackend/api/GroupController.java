@@ -148,4 +148,27 @@ public class GroupController {
         groupService.removeUserFromGroup(groupId, inviteRequest.getUserId(), jwtToken);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{groupId}/promote")
+    public ResponseEntity<?> promoteMember(@PathVariable UUID groupId, @RequestBody InviteRequest request, HttpServletRequest httpRequest) {
+        String jwtToken = parseJwt(httpRequest);
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token is missing or invalid");
+        }
+
+        groupService.promoteMember(groupId, request.getUserId(), jwtToken);
+        return ResponseEntity.ok().body("User promoted successfully.");
+    }
+
+    @PostMapping("/{groupId}/demote")
+    public ResponseEntity<?> demoteMember(@PathVariable UUID groupId, @RequestBody InviteRequest request, HttpServletRequest httpRequest) {
+        String jwtToken = parseJwt(httpRequest);
+        if (jwtToken == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("JWT token is missing or invalid");
+        }
+
+        groupService.demoteMember(groupId, request.getUserId(), jwtToken);
+        return ResponseEntity.ok().body("User demoted successfully.");
+    }
+
 }

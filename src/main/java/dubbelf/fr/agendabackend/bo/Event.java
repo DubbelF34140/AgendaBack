@@ -43,7 +43,7 @@ public class Event {
     private Game game; // Le jeu associé à l'événement
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<EventSetting> eventSettings; // Liste des paramètres choisis
+    private List<EventSetting> eventSettings;
 
     public UUID getId() {
         return id;

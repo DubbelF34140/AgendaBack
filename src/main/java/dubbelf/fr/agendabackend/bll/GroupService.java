@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -231,5 +232,76 @@ public class GroupService {
 
         return events.stream().map(EventMapper::toDTO).collect(Collectors.toList());
     }
+
+    @Transactional
+    public void promoteMember(UUID groupId, UUID userId, String jwtToken) {
+        UUID currentUserId = jwtUtils.getIDFromJwtToken(jwtToken);
+
+        GroupMember currentUserGroupMember = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not a member of this group"));
+
+        GroupMember memberToPromote = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
+                .orElseThrow(() -> new RuntimeException("User not in this group"));
+
+        Role currentRole = memberToPromote.getRole();
+        Role newRole = getNextHigherRole(currentRole, currentUserGroupMember.getRole());
+
+        if (newRole == null) {
+            throw new RuntimeException("User is already at the highest role or cannot be promoted.");
+        }
+
+        memberToPromote.setRole(newRole);
+        groupMemberRepository.save(memberToPromote);
+    }
+
+    @Transactional
+    public void demoteMember(UUID groupId, UUID userId, String jwtToken) {
+        UUID currentUserId = jwtUtils.getIDFromJwtToken(jwtToken);
+
+        GroupMember currentUserGroupMember = groupMemberRepository.findByGroupIdAndUserId(groupId, currentUserId)
+                .orElseThrow(() -> new RuntimeException("User not a member of this group"));
+
+        GroupMember memberToDemote = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
+                .orElseThrow(() -> new RuntimeException("User not in this group"));
+
+        if (memberToDemote.getRole() == Role.OWNER) {
+            throw new RuntimeException("You cannot demote the OWNER.");
+        }
+
+        Role currentRole = memberToDemote.getRole();
+        Role newRole = getNextLowerRole(currentRole);
+
+        if (newRole == null) {
+            throw new RuntimeException("User is already at the lowest role.");
+        }
+
+        memberToDemote.setRole(newRole);
+        groupMemberRepository.save(memberToDemote);
+    }
+
+    private Role getNextHigherRole(Role currentRole, Role promotingUserRole) {
+        if (promotingUserRole == Role.OWNER && currentRole == Role.ADMIN) {
+            return Role.OWNER; // Seul l'OWNER peut promouvoir un ADMIN en OWNER
+        }
+
+        return switch (currentRole) {
+            case GUEST -> Role.MEMBER;
+            case MEMBER -> Role.MODERATOR;
+            case MODERATOR -> Role.OWNER;
+            case OWNER -> Role.ADMIN;
+            case ADMIN -> null;
+        };
+    }
+
+    private Role getNextLowerRole(Role currentRole) {
+        return switch (currentRole) {
+            case ADMIN -> Role.OWNER;
+            case OWNER -> Role.MODERATOR;
+            case MODERATOR -> Role.MEMBER;
+            case MEMBER  -> Role.GUEST; // MEMBER est déjà le plus bas et OWNER ne peut pas être rétrogradé
+            case GUEST -> null;
+        };
+    }
+
 
 }

@@ -27,6 +27,9 @@ public class Game {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<GameSetting> settings;
 
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PlayerGameSetting> playersettings;
+
     public UUID getId() {
         return id;
     }
@@ -57,5 +60,13 @@ public class Game {
 
     public void setSettings(List<GameSetting> settings) {
         this.settings = settings;
+    }
+
+    public List<PlayerGameSetting> getPlayersettings() {
+        return playersettings;
+    }
+
+    public void setPlayersettings(List<PlayerGameSetting> playersettings) {
+        this.playersettings = playersettings;
     }
 }

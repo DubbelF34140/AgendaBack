@@ -4,10 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class GameSettingDTO {
+@NoArgsConstructor
+public class PlayerGameSettingDTO {
     private String key;
-    private String valueType;
-    private String defaultValue;
+    private String value;
 }

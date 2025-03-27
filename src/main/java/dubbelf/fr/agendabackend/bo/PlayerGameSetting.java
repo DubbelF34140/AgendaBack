@@ -2,17 +2,20 @@ package dubbelf.fr.agendabackend.bo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "game_settings")
+@Table(name = "player_game_settings")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class GameSetting {
+public class PlayerGameSetting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

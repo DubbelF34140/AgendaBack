@@ -1,14 +1,16 @@
 package dubbelf.fr.agendabackend.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventParticipationDTO {
+public class RespondEventParticipantDTO {
+    private String username;
     private List<PlayerGameSettingDTO> playersetting;
+
 }

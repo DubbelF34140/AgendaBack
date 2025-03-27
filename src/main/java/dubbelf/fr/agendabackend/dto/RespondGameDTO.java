@@ -14,4 +14,5 @@ public class RespondGameDTO {
     private String name;
     private String description;
     private List<RespondGameSettingDTO> settings;
+    private List<RespondGamePlayerSettingDTO> playersettings;
 }

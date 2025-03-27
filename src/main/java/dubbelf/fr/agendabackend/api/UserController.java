@@ -3,6 +3,7 @@ package dubbelf.fr.agendabackend.api;
 import dubbelf.fr.agendabackend.bo.User;
 import dubbelf.fr.agendabackend.bll.UserService;
 import dubbelf.fr.agendabackend.dto.UserRespond;
+import dubbelf.fr.agendabackend.dto.UserUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +32,17 @@ public class UserController {
     public List<UserRespond> getAllUser(@RequestHeader("Authorization") String authorizationHeader, @PathVariable UUID groupId) {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             return userService.getAllUser(groupId);
+        } else {
+            throw new RuntimeException("Authorization token is missing or invalid");
+        }
+    }
+
+    @PostMapping("/user/{userId}")
+    public UserRespond updateUser(
+            @RequestHeader("Authorization") String authorizationHeader, @PathVariable UUID userId, @RequestBody UserUpdate userUpdate) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            return userService.updateUser(userId, userUpdate.getPseudo(), userUpdate.getPassword(), userUpdate.getAvatarUrl());
         } else {
             throw new RuntimeException("Authorization token is missing or invalid");
         }

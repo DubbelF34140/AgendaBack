@@ -2,10 +2,13 @@ package dubbelf.fr.agendabackend.bll;
 
 import dubbelf.fr.agendabackend.bo.Game;
 import dubbelf.fr.agendabackend.bo.GameSetting;
+import dubbelf.fr.agendabackend.bo.PlayerGameSetting;
 import dubbelf.fr.agendabackend.dal.GameRepository;
 import dubbelf.fr.agendabackend.dal.GameSettingRepository;
+import dubbelf.fr.agendabackend.dal.PlayerGameSettingRepository;
 import dubbelf.fr.agendabackend.dto.GameCreateDTO;
 import dubbelf.fr.agendabackend.dto.RespondGameDTO;
+import dubbelf.fr.agendabackend.dto.RespondGamePlayerSettingDTO;
 import dubbelf.fr.agendabackend.dto.RespondGameSettingDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class GameService {
 
     @Autowired
     private GameSettingRepository gameSettingRepository;
+    @Autowired
+    private PlayerGameSettingRepository playerGameSettingRepository;
 
     public Game createGame(GameCreateDTO gameCreateDTO) {
         Game game = new Game();
@@ -43,6 +48,18 @@ public class GameService {
 
         gameSettingRepository.saveAll(settings);
         game.setSettings(settings);
+
+        List<PlayerGameSetting> playersettings = gameCreateDTO.getPlayersettings().stream().map(dto -> {
+            PlayerGameSetting setting = new PlayerGameSetting();
+            setting.setGame(savedGame);
+            setting.setKey(dto.getKey());
+            setting.setValueType(dto.getValueType());
+            setting.setDefaultValue(dto.getDefaultValue());
+            return setting;
+        }).collect(Collectors.toList());
+
+        playerGameSettingRepository.saveAll(playersettings);
+        game.setPlayersettings(playersettings);
         return game;
     }
 
@@ -68,8 +85,24 @@ public class GameService {
         }
     }
 
-    public Game getGameById(UUID gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() -> new RuntimeException("Game not found"));
+    public RespondGameDTO getGameById(UUID gameId) {
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new RuntimeException("Game not found"));
+        return new RespondGameDTO(
+                game.getId(),
+                game.getName(),
+                game.getDescription(),
+                game.getSettings().stream().map(setting -> new RespondGameSettingDTO(
+                        setting.getId(),
+                        setting.getKey(),
+                        setting.getValueType(),
+                        setting.getDefaultValue()
+                )).collect(Collectors.toList()),
+                game.getPlayersettings().stream().map(setting -> new RespondGamePlayerSettingDTO(
+                        setting.getId(),
+                        setting.getKey(),
+                        setting.getValueType(),
+                        setting.getDefaultValue()
+                )).collect(Collectors.toList()));
     }
 
     public List<RespondGameDTO> getAllGames() {
@@ -80,6 +113,12 @@ public class GameService {
                 game.getName(),
                 game.getDescription(),
                 game.getSettings().stream().map(setting -> new RespondGameSettingDTO(
+                        setting.getId(),
+                        setting.getKey(),
+                        setting.getValueType(),
+                        setting.getDefaultValue()
+                )).collect(Collectors.toList()),
+                game.getPlayersettings().stream().map(setting -> new RespondGamePlayerSettingDTO(
                         setting.getId(),
                         setting.getKey(),
                         setting.getValueType(),

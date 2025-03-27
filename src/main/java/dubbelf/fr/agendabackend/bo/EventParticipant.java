@@ -3,6 +3,7 @@ package dubbelf.fr.agendabackend.bo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +28,10 @@ public class EventParticipant {
 
     @Column(nullable = false)
     private String team;
+
+    @OneToMany(mappedBy = "eventParticipant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(nullable = true)
+    private List<PlayerEventSetting> playereventSettings;
 
     public UUID getId() {
         return id;
@@ -58,5 +63,13 @@ public class EventParticipant {
 
     public void setTeam(String team) {
         this.team = team;
+    }
+
+    public List<PlayerEventSetting> getPlayereventSettings() {
+        return playereventSettings;
+    }
+
+    public void setPlayereventSettings(List<PlayerEventSetting> playereventSettings) {
+        this.playereventSettings = playereventSettings;
     }
 }
