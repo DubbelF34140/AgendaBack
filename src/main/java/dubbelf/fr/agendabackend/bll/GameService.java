@@ -33,6 +33,7 @@ public class GameService {
         Game game = new Game();
         game.setName(gameCreateDTO.getName());
         game.setDescription(gameCreateDTO.getDescription());
+        game.setAvatarUrl(gameCreateDTO.getAvatarUrl());
 
         // Sauvegarde du jeu en base avant d'ajouter les settings
         Game savedGame = gameRepository.save(game);
@@ -91,6 +92,7 @@ public class GameService {
                 game.getId(),
                 game.getName(),
                 game.getDescription(),
+                game.getAvatarUrl(),
                 game.getSettings().stream().map(setting -> new RespondGameSettingDTO(
                         setting.getId(),
                         setting.getKey(),
@@ -112,6 +114,7 @@ public class GameService {
                 game.getId(),
                 game.getName(),
                 game.getDescription(),
+                game.getAvatarUrl(),
                 game.getSettings().stream().map(setting -> new RespondGameSettingDTO(
                         setting.getId(),
                         setting.getKey(),

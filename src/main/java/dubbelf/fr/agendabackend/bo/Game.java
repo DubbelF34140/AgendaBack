@@ -30,6 +30,8 @@ public class Game {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PlayerGameSetting> playersettings;
 
+    private String avatarUrl;
+
     public UUID getId() {
         return id;
     }
@@ -68,5 +70,13 @@ public class Game {
 
     public void setPlayersettings(List<PlayerGameSetting> playersettings) {
         this.playersettings = playersettings;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

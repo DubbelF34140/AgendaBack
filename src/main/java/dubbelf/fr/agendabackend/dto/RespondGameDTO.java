@@ -13,6 +13,7 @@ public class RespondGameDTO {
     private UUID id;
     private String name;
     private String description;
+    private String avatarUrl;
     private List<RespondGameSettingDTO> settings;
     private List<RespondGamePlayerSettingDTO> playersettings;
 }

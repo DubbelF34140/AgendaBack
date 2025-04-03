@@ -11,6 +11,7 @@ import java.util.List;
 public class GameCreateDTO {
     private String name;
     private String description;
+    private String avatarUrl;
     private List<GameSettingDTO> settings;
     private List<CreatePlayerGameSettingDTO> playersettings;
 }
