@@ -43,12 +43,16 @@ public class GroupService {
     public List<GroupDTO> getUserGroups(String jwtToken) {
         UUID userId = jwtUtils.getIDFromJwtToken(jwtToken);
         Optional<User> userOpt = userRepository.findById(userId);
-        List<Group> createdGroups = groupRepository.findByUsersContains(userOpt);
+        List<Group> Groups = groupRepository.findByUsersContains(userOpt);
 
         if (userOpt.isEmpty()) {
             throw new RuntimeException("User not found");
         }
-        return createdGroups.stream().map(GroupMapper::toDTO).collect(Collectors.toList());
+        if (userOpt.get().isAdministrateur()){
+            List<Group> AdminGroups = groupRepository.findAll();
+            return AdminGroups.stream().map(GroupMapper::toDTO).collect(Collectors.toList());
+        }
+        return Groups.stream().map(GroupMapper::toDTO).collect(Collectors.toList());
     }
 
     // Créer un nouveau groupe
