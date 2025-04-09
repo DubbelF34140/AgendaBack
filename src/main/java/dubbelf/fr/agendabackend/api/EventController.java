@@ -43,7 +43,7 @@ public class EventController {
     public ResponseEntity<Void> deleteEvent(@PathVariable UUID eventId, HttpServletRequest request) {
         String jwtToken = parseJwt(request);
         eventService.deleteEvent(eventId, jwtToken);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(null);
     }
 
     // Modifier un événement
