@@ -17,7 +17,7 @@ public class EventSetting {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 

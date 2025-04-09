@@ -21,7 +21,7 @@ public class PlayerGameSetting {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_id", nullable = false)
     @JsonIgnore
     private Game game;

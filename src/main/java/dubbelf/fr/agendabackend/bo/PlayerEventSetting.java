@@ -26,7 +26,7 @@ public class PlayerEventSetting {
     @Column(nullable = false, length = 1000)
     private String value; // Valeur spécifique pour cet événement (ex : "5 joueurs équipe 1")
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "event_participant_id", nullable = true)
     private EventParticipant eventParticipant;
 
